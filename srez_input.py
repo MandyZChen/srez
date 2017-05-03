@@ -40,8 +40,7 @@ def setup_inputs(sess, filenames, image_size=None, capacity_factor=3):
         downsampled = tf.image.resize_area(image, [image_size//K, image_size//K])
         feature = tf.reshape(downsampled, [image_size//K, image_size//K, 3])
     elif FLAGS.input == 'noise':
-        K = 4
-        feature = tf.random_uniform(shape=[image_size//K, image_size//K, 3],minval= -1., maxval=1.)
+        feature = tf.random_uniform(shape=[FLAGS.noise_dimension, FLAGS.noise_dimension, 3],minval= -1., maxval=1.)
 
     label   = tf.reshape(image,       [image_size,   image_size,     3])
 

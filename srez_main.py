@@ -98,6 +98,8 @@ tf.app.flags.DEFINE_integer('gen_norm', 1, "Normalization in the generator or no
 
 tf.app.flags.DEFINE_string('input', 'noise', "Input image: [scaled | noise]")
 
+tf.app.flags.DEFINE_integer('noise_dimension', 4, "Dimension of noise input")
+
 def prepare_dirs(delete_train_dir=False):
     # Create checkpoint dir (do not delete anything)
     if not tf.gfile.Exists(FLAGS.checkpoint_dir):
@@ -199,7 +201,7 @@ def _train():
     if FLAGS.input == 'scaled':
         test_features = tf.image.resize_area(test_labels, [16, 16])
     elif FLAGS.input == 'noise':
-        test_features = tf.random_uniform(shape=[16, 4, 4, 3],minval= -1., maxval=1.)
+        test_features = tf.random_uniform(shape=[16, FLAGS.noise_dimension, FLAGS.noise_dimension, 3],minval= -1., maxval=1.)
 
     # Add some noise during training (think denoising autoencoders)
     noise_level = FLAGS.train_noise

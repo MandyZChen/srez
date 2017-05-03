@@ -105,9 +105,10 @@ def train_model(train_data):
             feed_dict = {td.gene_minput: test_feature}
             gene_output = td.sess.run(td.gene_moutput, feed_dict=feed_dict)
             _summarize_progress(td, test_feature, test_label,gene_output, batch, 'out', max_samples=td.max_samples)
-            test_merged = tf.summary.merge_all(key='test_scalars')
-            test_summaries = td.sess.run(test_merged, feed_dict=feed_dict)
-            td.summary_writer.add_summary(test_summaries,batch)
+            if FLAGS.input != 'noise':
+                test_merged = tf.summary.merge_all(key='test_scalars')
+                test_summaries = td.sess.run(test_merged, feed_dict=feed_dict)
+                td.summary_writer.add_summary(test_summaries,batch)
         
         if batch % 10 == 0:
 
