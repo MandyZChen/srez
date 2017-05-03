@@ -382,7 +382,7 @@ def _generator_model(sess, features, labels, channels):
     # Upside-down all-convolutional resnet
 
     mapsize = 3
-    res_units  = [256, 128, 96]
+    res_units  = [256, 256, 128, 128, 96]
 
     old_vars = tf.global_variables()
 
@@ -504,14 +504,17 @@ def create_generator_loss(disc_output, gene_output, features):
 
 
     # I.e. does the result look like the feature?
-    K = int(gene_output.get_shape()[1])//int(features.get_shape()[1])
-    assert K == 2 or K == 4 or K == 8    
-    downscaled = _downscale(gene_output, K)
+    if FLAGS.input != 'noise':
+        K = int(gene_output.get_shape()[1])//int(features.get_shape()[1])
+        assert K == 2 or K == 4 or K == 8    
+        downscaled = _downscale(gene_output, K)
     
-    gene_l1_loss  = tf.reduce_mean(tf.abs(downscaled - features), name='gene_l1_loss')
+        gene_l1_loss  = tf.reduce_mean(tf.abs(downscaled - features), name='gene_l1_loss')
     
-    gene_loss = tf.add((1.0 - FLAGS.gene_l1_factor) * (gene_ce_loss),
-        FLAGS.gene_l1_factor * gene_l1_loss, name='gene_loss')
+        gene_loss = tf.add((1.0 - FLAGS.gene_l1_factor) * (gene_ce_loss),
+                           FLAGS.gene_l1_factor * gene_l1_loss, name='gene_loss')
+    else:
+        gene_loss = gene_ce_loss
         
     return gene_loss
 

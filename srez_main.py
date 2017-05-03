@@ -199,7 +199,7 @@ def _train():
     if FLAGS.input == 'scaled':
         test_features = tf.image.resize_area(test_labels, [16, 16])
     elif FLAGS.input == 'noise':
-        test_features = tf.random_uniform(shape=[16, 16, 16, 3],minval= -1., maxval=1.)
+        test_features = tf.random_uniform(shape=[16, 4, 4, 3],minval= -1., maxval=1.)
 
     # Add some noise during training (think denoising autoencoders)
     noise_level = FLAGS.train_noise
@@ -213,12 +213,13 @@ def _train():
     # >>> add summary scalars for test set
     max_samples = 10 # output 10 test images
     gene_output_clipped = tf.maximum(tf.minimum(gene_moutput, 1.0), 0.)
-    l1_quality  = tf.reduce_sum(tf.abs(gene_output_clipped - test_labels), [1,2,3])
-    l1_quality = tf.reduce_mean(l1_quality[:max_samples])
-    mse_quality  = tf.reduce_sum(tf.square(gene_output_clipped - test_labels), [1,2,3])
-    mse_quality = tf.reduce_mean(mse_quality[:max_samples])
-    tf.summary.scalar('l1_quality', l1_quality, collections=['test_scalars'])
-    tf.summary.scalar('mse_quality', mse_quality, collections=['test_scalars'])
+    if FLAGS.input != 'noise':
+      l1_quality  = tf.reduce_sum(tf.abs(gene_output_clipped - test_labels), [1,2,3])
+      l1_quality = tf.reduce_mean(l1_quality[:max_samples])
+      mse_quality  = tf.reduce_sum(tf.square(gene_output_clipped - test_labels), [1,2,3])
+      mse_quality = tf.reduce_mean(mse_quality[:max_samples])
+      tf.summary.scalar('l1_quality', l1_quality, collections=['test_scalars'])
+      tf.summary.scalar('mse_quality', mse_quality, collections=['test_scalars'])
 
 
     gene_loss = srez_model.create_generator_loss(disc_fake_output, gene_output, train_features)
