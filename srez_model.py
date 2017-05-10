@@ -246,11 +246,15 @@ class Model:
         # Bottleneck residual block
         if FLAGS.gen_norm:
             self.add_batch_norm()
+
         self.add_relu()
         self.add_conv2d(num_units//4, mapsize=1,       stride=1,      stddev_factor=2.)
+        
         if FLAGS.gen_norm:
             self.add_batch_norm()
+
         self.add_relu()
+
         if transpose:
             self.add_conv2d_transpose(num_units//4,
                                       mapsize=mapsize,
@@ -263,6 +267,7 @@ class Model:
                             stddev_factor=2.)
         if FLAGS.gen_norm:
             self.add_batch_norm()
+        
         self.add_relu()
         self.add_conv2d(num_units,    mapsize=1,       stride=1,      stddev_factor=2.)
 
@@ -344,6 +349,7 @@ def _discriminator_model(sess, features, disc_input):
         stddev_factor = 2.0
 
         model.add_conv2d(nunits, mapsize=mapsize, stride=2, stddev_factor=stddev_factor)
+        
         if FLAGS.critic_norm == 'batch':
             model.add_batch_norm()
         elif FLAGS.critic_norm == 'layer':
@@ -353,6 +359,7 @@ def _discriminator_model(sess, features, disc_input):
 
     # Finalization a la "all convolutional net"
     model.add_conv2d(nunits, mapsize=mapsize, stride=1, stddev_factor=stddev_factor)
+    
     if FLAGS.critic_norm == 'batch':
         model.add_batch_norm()
     elif FLAGS.critic_norm == 'layer':
@@ -361,6 +368,7 @@ def _discriminator_model(sess, features, disc_input):
     model.add_relu()
 
     model.add_conv2d(nunits, mapsize=1, stride=1, stddev_factor=stddev_factor)
+    
     if FLAGS.critic_norm == 'batch':
         model.add_batch_norm()
     elif FLAGS.critic_norm == 'layer':
@@ -399,16 +407,20 @@ def _generator_model(sess, features, labels, channels):
             # Spatial upscale (see http://distill.pub/2016/deconv-checkerboard/)
             # and transposed convolution
             model.add_upscale()
+            
             if FLAGS.gen_norm:
                 model.add_batch_norm()
+            
             model.add_relu()
             model.add_conv2d_transpose(nunits, mapsize=mapsize, stride=1, stddev_factor=1.)
 
     elif FLAGS.gen_architect == 'deconv':
         for ru in range(len(res_units)-1):
             nunits  = res_units[ru]
+            
             if FLAGS.gen_norm:
                 model.add_batch_norm()
+            
             model.add_relu()
             model.add_conv2d_transpose(nunits, mapsize=mapsize, stride=2, stddev_factor=1.)
 

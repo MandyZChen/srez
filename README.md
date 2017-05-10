@@ -12,7 +12,7 @@ This particular example was produced after training the network for 3 hours on a
 
 # How it works
 
-In essence the architecture is a DCGAN where the input to the generator network is the 16x16 image rather than a multinomial gaussian distribution.
+In essence the architecture is a generative adversarial networks (GANs) where the input to the generator network is the 16x16 image rather than a multinomial gaussian distribution.
 
 In addition to that the loss function of the generator has a term that measures the L1 difference between the 16x16 input and downscaled version of the image produced by the generator.
 
@@ -20,20 +20,31 @@ The adversarial term of the loss function ensures the generator produces plausib
 
 Finally, the generator network relies on ResNet modules as we've found them to train substantially faster than more old-fashioned architectures. The adversarial network is much simpler as the use of ResNet modules did not provide an advantage during our experimentation.
 
+We provided options (or flags) in 'srez_main.py' to change the components of the model. Three different training objectives were implemented: the vanilla GAN (Goodfellow et al., 2014), WGAN (Arjovsky & Bottou, 2017) and the improved WGAN (Gulrajani et al., 2017). Other changable options include optimizers (Adam/RMSprop), architectures (DCGAN/ ResNet), normalization (batch/ layer), and input data (low dimensional noise/ downscaled images). This repo was used for a systematic investigation on the application of the
+newly proposed Wasserstein GAN objective (and its improved version). We also checked the claims of WGAN, namely stable and converging training on a variety of architectures, and the effectiveness of the Wasserstein distance as an indicator of training progress. For more details, please read our paper at https://arxiv.org/abs/1705.02438.
+
 # Requirements
 
 You will need Python 3 with Tensorflow, numpy, scipy and [moviepy](http://zulko.github.io/moviepy/). See `requirements.txt` for details.
 
 ## Dataset
 
-After you have the required software above you will also need the `Large-scale CelebFaces Attributes (CelebA) Dataset`. The model expects the `Align&Cropped Images` version. Extract all images to a subfolder named `dataset`. I.e. `srez/dataset/lotsoffiles.jpg`.
+After you have the required software above you will also need the `Large-scale CelebFaces Attributes (CelebA) Dataset`. The model expects the `Align&Cropped Images` version. Extract all images to a subfolder named `dataset`. I.e. `srez/dataset/lotsoffiles.jpg`. You are also welcome to use 'download_data.py'.
 
 # Training the model
 
-Training with default settings: `python3 srez_main.py --run train`. The script will periodically output an example batch in PNG format onto the `srez/train` folder, and checkpoint data will be stored in the `srez/checkpoint` folder.
+Training with default settings: `python3 srez_main.py --run train`. The script will periodically output an example batch in PNG format onto the `srez/train` folder, and checkpoint data will be stored in the `srez/checkpoint` folder. You can also use 'run_script.sh' to set particular parameters and shut down computing instances on cloud after training finishes.
 
-After the network has trained you can also produce an animation showing the evolution of the output by running `python3 srez_main.py --run demo`.
+After the network has trained you can also produce an animation showing the evolution of the output by running `python3 srez_main.py --run demo`. This script generates a demo using checkpoints.
 
 # About the author
+The current repo is maintained by:
+Zhimin Chen (https://whitneylab.berkeley.edu/zhimin_chen.html)
 
+This github repo was forked from David Garcia:
 [LinkedIn profile of David Garcia](https://ca.linkedin.com/in/david-garcia-70913311).
+
+## References
+Goodfellow, Ian J. (2014) On distinguishability criteria for estimating generative models. arXiv preprint arXiv:1412.6515.
+Arjovsky, M., & Bottou, L. (2017). Towards principled methods for training generative adversarial networks. In NIPS 2016 Workshop on Adversarial Training.
+Gulrajani, I., Ahmed, F., Arjovsky, M., Dumoulin, V., & Courville, A. (2017). Improved Training of Wasserstein GANs. arXiv preprint arXiv:1704.00028.

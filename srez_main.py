@@ -122,7 +122,6 @@ def prepare_dirs(delete_train_dir=False):
 
     filenames = tf.gfile.ListDirectory(FLAGS.dataset)
     filenames = sorted(filenames)
-    #random.shuffle(filenames)
     filenames = [os.path.join(FLAGS.dataset, f) for f in filenames]
 
     return filenames
@@ -187,17 +186,26 @@ def _train():
     # Separate training and test sets
     # train_filenames = all_filenames[:-FLAGS.test_vectors]
     # test_filenames  = all_filenames[-FLAGS.test_vectors:]
+
+
+    # We chose a pre-determined set of faces for the convenience of comparing results across models
     determined_test = [73883-1, 110251-1, 36510-1, 132301-1, 57264-1, 152931-1, 93861-1,
     124938-1, 79512-1, 106152-1, 127384-1, 134028-1, 67874-1,
     10613-1, 198694-1, 100990-1]
     all_filenames = np.array(all_filenames)
     train_filenames = list(np.delete(all_filenames, determined_test))
+
 #     test_filenames = list(all_filenames[determined_test])
+
     # Setup async input queues
     train_features, train_labels = srez_input.setup_inputs(sess, train_filenames)
+    
     # test_features,  test_labels  = srez_input.setup_inputs(sess, test_filenames)
+    
+    # Test sets are stored in 'testset_label.npy'
     test_labels = np.load('testset_label.npy')
     test_labels = tf.convert_to_tensor(test_labels, dtype = tf.float32)
+
     if FLAGS.input == 'scaled':
         test_features = tf.image.resize_area(test_labels, [16, 16])
     elif FLAGS.input == 'noise':
@@ -215,6 +223,8 @@ def _train():
     # >>> add summary scalars for test set
     max_samples = 10 # output 10 test images
     gene_output_clipped = tf.maximum(tf.minimum(gene_moutput, 1.0), 0.)
+    
+    # Calculate the L1 error between output samples and labels as a objective measure of image quality
     if FLAGS.input != 'noise':
       l1_quality  = tf.reduce_sum(tf.abs(gene_output_clipped - test_labels), [1,2,3])
       l1_quality = tf.reduce_mean(l1_quality[:max_samples])
@@ -228,6 +238,7 @@ def _train():
     disc_real_loss, disc_fake_loss = \
                      srez_model.create_discriminator_loss(disc_real_output, disc_fake_output)
 
+    # Different training objectives
     if FLAGS.loss_func == 'dcgan':
         # for DCGAN
         disc_loss = tf.add(disc_real_loss, disc_fake_loss, name='disc_loss')
@@ -244,6 +255,7 @@ def _train():
     (global_step, learning_rate, gene_minimize, disc_minimize, d_clip) = \
             srez_model.create_optimizers(gene_loss, gene_var_list, disc_loss, disc_var_list)
 
+    # For tensorboard
     tf.summary.scalar('generator_loss', gene_loss)
     tf.summary.scalar('discriminator_real_loss', disc_real_loss)
     tf.summary.scalar('discriminator_fake_loss', disc_fake_loss)

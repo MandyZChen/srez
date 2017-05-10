@@ -24,8 +24,7 @@ def _summarize_progress(train_data, feature, label, gene_output, batch, suffix, 
     image_summary = td.sess.run(image_op)
     td.summary_writer.add_summary(image_summary, batch)
 
-    # if FLAGS.output_image:
-        # Only present the generator output
+    # Save only the generated images
     clipped_image = clipped[0:max_samples,:,:,:]
     image_gen = tf.concat([clipped_image[i,:,:,:] for i in range(max_samples)], 1)
     image_gen = td.sess.run(image_gen)
@@ -33,7 +32,8 @@ def _summarize_progress(train_data, feature, label, gene_output, batch, suffix, 
     filename_gen = os.path.join(FLAGS.train_dir, filename_gen)
     scipy.misc.toimage(image_gen, cmin=0., cmax=1.).save(filename_gen)
     print("    Saved %s" % (filename_gen,))
-    # else:
+    
+    # Save input, bicubic, output and labels together
     image = image[0:max_samples,:,:,:]
     image = tf.concat([image[i,:,:,:] for i in range(max_samples)], 0)
     image = td.sess.run(image)
@@ -105,6 +105,7 @@ def train_model(train_data):
             feed_dict = {td.gene_minput: test_feature}
             gene_output = td.sess.run(td.gene_moutput, feed_dict=feed_dict)
             _summarize_progress(td, test_feature, test_label,gene_output, batch, 'out', max_samples=td.max_samples)
+            
             if FLAGS.input != 'noise':
                 test_merged = tf.summary.merge_all(key='test_scalars')
                 test_summaries = td.sess.run(test_merged, feed_dict=feed_dict)
