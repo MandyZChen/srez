@@ -44,7 +44,7 @@ Zhimin Chen (https://whitneylab.berkeley.edu/zhimin_chen.html)
 This github repo was forked from David Garcia:
 [LinkedIn profile of David Garcia](https://ca.linkedin.com/in/david-garcia-70913311).
 
-## References
+# References
 Goodfellow, Ian J. (2014) On distinguishability criteria for estimating generative models. arXiv preprint arXiv:1412.6515.
 Arjovsky, M., & Bottou, L. (2017). Towards principled methods for training generative adversarial networks. In NIPS 2016 Workshop on Adversarial Training.
 Gulrajani, I., Ahmed, F., Arjovsky, M., Dumoulin, V., & Courville, A. (2017). Improved Training of Wasserstein GANs. arXiv preprint arXiv:1704.00028.
