@@ -39,7 +39,7 @@ After the network has trained you can also produce an animation showing the evol
 
 # About the author
 The current repo is maintained by:
-Zhimin Chen (https://whitneylab.berkeley.edu/zhimin_chen.html)
+Zhimin Chen (https://mandyzchen.github.io/)
 
 This github repo was forked from David Garcia:
 [LinkedIn profile of David Garcia](https://ca.linkedin.com/in/david-garcia-70913311).
